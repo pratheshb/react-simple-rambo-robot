@@ -7,11 +7,11 @@ export default class App extends React.Component {
     super(props);
     this.state = {
       robotDirection: 0,
-      robotPlacement: {
+      robotPosition: {
         x: 1,
         y: 1
       },
-      warning: null,
+      warn: null,
     }
     this.handleClick = this.handleClick.bind(this);
   }
@@ -33,7 +33,7 @@ export default class App extends React.Component {
   }
 
   handleMove() {
-    let { x, y } = this.state.robotPlacement;
+    let { x, y } = this.state.robotPosition;
     let warn = null;
     const msg = 'Oops: Hit on the wall!';
     switch (this.state.robotDirection) {
@@ -69,13 +69,13 @@ export default class App extends React.Component {
         break;
     }
     this.setState({
-      robotPlacement: { x, y },
+      robotPosition: { x, y },
       warn
     });
   }
 
   handleTurn() {
-    let { robotDirection } = this.state
+    let { robotDirection } = this.state;
     robotDirection += 90;
     if (robotDirection === 360) {
       robotDirection = 0;
@@ -86,7 +86,7 @@ export default class App extends React.Component {
   handleReset() {
     this.setState({
       robotDirection: 0,
-      robotPlacement: {
+      robotPosition: {
         x: 1,
         y: 1
       },
@@ -95,11 +95,12 @@ export default class App extends React.Component {
   }
 
   render() {
+    const { robotDirection, robotPosition } = this.state;
     return (
       <div className="container">
         <ToolBar onClick={this.handleClick} warn={this.state.warn}>
         </ToolBar>
-        <Room {...this.state}></Room>
+        <Room position={robotPosition} direction={robotDirection}></Room>
       </div>
     );
   }
