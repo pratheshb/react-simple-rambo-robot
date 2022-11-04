@@ -34,34 +34,37 @@ export default class App extends React.Component {
 
   handleMove() {
     let { x, y } = this.state.robotPosition;
-    let warn = null;
-    const msg = 'Oops: Hit on the wall!';
+    const setErrorMessage = () => {
+      this.setState({
+        warn: 'Oops: Hit on the wall!'
+      });
+    }
     switch (this.state.robotDirection) {
       case 0:
         if (y === 10) {
-          warn = msg;
-          break;
+          setErrorMessage();
+          return;
         }
         y++;
         break;
       case 90:
         if (x === 10) {
-          warn = msg;
-          break;
+          setErrorMessage();
+          return;
         }
         x++;
         break;
       case 180:
         if (y === 1) {
-          warn = msg;
-          break;
+          setErrorMessage();
+          return;
         }
         y--;
         break;
       case 270:
         if (x === 1) {
-          warn = msg;
-          break;
+          setErrorMessage();
+          return;
         }
         x--;
         break;
@@ -70,7 +73,7 @@ export default class App extends React.Component {
     }
     this.setState({
       robotPosition: { x, y },
-      warn
+      warn: null
     });
   }
 
