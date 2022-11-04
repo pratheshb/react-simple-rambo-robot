@@ -33,46 +33,32 @@ export default class App extends React.Component {
   }
 
   handleMove() {
-    let { x, y } = this.state.robotPosition;
+    if (this.state.warn) {
+      return;
+    }
+    const { robotPosition, robotDirection } = this.state;
     const setErrorMessage = () => {
       this.setState({
         warn: 'Oops: Hit on the wall!'
       });
-    }
-    switch (this.state.robotDirection) {
-      case 0:
-        if (y === 10) {
+    };
+    const possibleMovements = [
+      { direction: 0, axis: 'y', index: +1, limit: 10 },
+      { direction: 90, axis: 'x', index: +1, limit: 10 },
+      { direction: 180, axis: 'y', index: -1, limit: 1 },
+      { direction: 270, axis: 'x', index: -1, limit: 1 },
+    ];
+    for (const { direction, axis, index, limit } of possibleMovements) {
+      if (robotDirection === direction) {
+        if (robotPosition[axis] === limit) {
           setErrorMessage();
           return;
         }
-        y++;
-        break;
-      case 90:
-        if (x === 10) {
-          setErrorMessage();
-          return;
-        }
-        x++;
-        break;
-      case 180:
-        if (y === 1) {
-          setErrorMessage();
-          return;
-        }
-        y--;
-        break;
-      case 270:
-        if (x === 1) {
-          setErrorMessage();
-          return;
-        }
-        x--;
-        break;
-      default:
-        break;
+        robotPosition[axis] += index;
+      }
     }
     this.setState({
-      robotPosition: { x, y },
+      robotPosition,
       warn: null
     });
   }
