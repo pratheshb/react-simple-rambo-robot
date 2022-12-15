@@ -1,96 +1,47 @@
-import React from 'react';
+import { useState } from 'react';
 import './App.css';
 import ToolBar from './components/ToolBar/ToolBar';
 import Room from './components/Room/Room';
-export default class App extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      robotDirection: 0,
-      robotPosition: {
-        x: 1,
-        y: 1
-      },
-      warn: null,
+
+
+export default function App() {
+  const [direction, setDirection] = useState(0);
+  const [position, setPosition] = useState({ x: 1, y: 1 });
+  const [warn, setWarn] = useState(null);
+
+  function handleMove() {
+    const newPos = {
+      ...position
     }
-    this.handleClick = this.handleClick.bind(this);
+    const isMovingHorizontal = direction === 0 || direction === 180;
+    const isMovingForward = direction === 0 || direction === 90;
+    const axis = isMovingHorizontal ? 'y' : 'x';
+    const index = isMovingForward ? +1 : -1;
+    const limit = isMovingForward ? 10 : 1;
+    if (position[axis] === limit) {
+      return setWarn('Oops: Hit on the wall!');
+    }
+    newPos[axis] += index;
+    setPosition(newPos);
+    setWarn(null);
   }
 
-  handleClick(e) {
-    switch (e.target.id) {
-      case 'move':
-        this.handleMove();
-        break;
-      case 'turn':
-        this.handleTurn();
-        break;
-      case 'reset':
-        this.handleReset();
-        break;
-      default:
-        break;
-    }
+  function handleTurn() {
+    setDirection(direction === 270 ? 0 : direction + 90);
+    setWarn(null);
   }
 
-  handleMove() {
-    if (this.state.warn) {
-      return;
-    }
-    const { robotPosition, robotDirection } = this.state;
-    const setErrorMessage = () => {
-      this.setState({
-        warn: 'Oops: Hit on the wall!'
-      });
-    };
-    const possibleMovements = [
-      { direction: 0, axis: 'y', index: +1, limit: 10 },
-      { direction: 90, axis: 'x', index: +1, limit: 10 },
-      { direction: 180, axis: 'y', index: -1, limit: 1 },
-      { direction: 270, axis: 'x', index: -1, limit: 1 },
-    ];
-    for (const { direction, axis, index, limit } of possibleMovements) {
-      if (robotDirection === direction) {
-        if (robotPosition[axis] === limit) {
-          setErrorMessage();
-          return;
-        }
-        robotPosition[axis] += index;
-      }
-    }
-    this.setState({
-      robotPosition,
-      warn: null
-    });
+  function handleReset() {
+    setPosition({ x: 1, y: 1 });
+    setDirection(0);
+    setWarn(null);
   }
 
-  handleTurn() {
-    let { robotDirection } = this.state;
-    robotDirection += 90;
-    if (robotDirection === 360) {
-      robotDirection = 0;
-    }
-    this.setState({ robotDirection, warn: null });
-  }
-
-  handleReset() {
-    this.setState({
-      robotDirection: 0,
-      robotPosition: {
-        x: 1,
-        y: 1
-      },
-      warn: null
-    });
-  }
-
-  render() {
-    const { robotDirection, robotPosition } = this.state;
-    return (
-      <div className="container">
-        <ToolBar onClick={this.handleClick} warn={this.state.warn}>
-        </ToolBar>
-        <Room position={robotPosition} direction={robotDirection}></Room>
-      </div>
-    );
-  }
+  return (
+    <div className="container">
+      <ToolBar onMove={handleMove} onTurn={handleTurn} onReset={handleReset} warn={warn}>
+      </ToolBar>
+      <Room position={position} direction={direction}></Room>
+    </div>
+  );
 }
