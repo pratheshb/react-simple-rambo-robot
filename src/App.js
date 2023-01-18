@@ -1,18 +1,37 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import './App.css';
 import ToolBar from './components/ToolBar/ToolBar';
 import Room from './components/Room/Room';
 
+const keyDirection = {
+  "ArrowRight": 0,
+  "ArrowDown": 90,
+  "ArrowLeft": 180,
+  "ArrowUp": 270,
+}
 
 export default function App() {
   const [direction, setDirection] = useState(0);
   const [position, setPosition] = useState({ x: 1, y: 1 });
   const [warn, setWarn] = useState(null);
 
-  function handleMove() {
-    const newPos = {
-      ...position
+  useEffect(() => {
+    console.log('effect')
+    function handleKeup(e) {
+      if(e.code.startsWith('Arrow')) {
+        if(keyDirection[e.code] === direction) {
+          handleMove();
+        } else {
+          setDirection(keyDirection[e.code]);
+          setWarn(null);
+        }
+      }
     }
+    document.body.addEventListener('keyup', handleKeup)
+    return () => document.body.removeEventListener('keyup', handleKeup)
+  }, [position, direction])
+
+  function handleMove() {
     const isMovingHorizontal = direction === 0 || direction === 180;
     const isMovingForward = direction === 0 || direction === 90;
     const axis = isMovingHorizontal ? 'y' : 'x';
@@ -21,9 +40,11 @@ export default function App() {
     if (position[axis] === limit) {
       return setWarn('Oops: Hit on the wall!');
     }
-    newPos[axis] += index;
-    setPosition(newPos);
-    setWarn(null);
+    const nextPosition = {
+      ...position
+    }
+    nextPosition[axis] += index;
+    setPosition(nextPosition);
   }
 
   function handleTurn() {

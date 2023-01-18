@@ -8,9 +8,9 @@ function ToolBar(props) {
         <button id="turn" className="turn" onClick={props.onTurn}>Turn</button>
         <button id="reset" className="reset" onClick={props.onReset}>Reset</button>
       </span>
-      <span className="warn">
+      <strong className="warn">
       { props.warn }
-      </span>
+      </strong>
     </div>
   );
 }
